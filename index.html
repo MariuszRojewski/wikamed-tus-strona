@@ -23,6 +23,8 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Merriweather:wght@100;200;300;400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
+    <!-- reCAPTCHA script -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <style>
       @media (max-width: 980px) {
         .org {
@@ -2387,6 +2389,7 @@
           </div>
           <!-- PRAWA KOLUMNA – FORMULARZ -->
           <form
+            id="contact-form"
             name="wikamed-contact"
             method="POST"
             netlify
@@ -2484,9 +2487,16 @@
             <!-- Ukryte pole honeypot dla ochrony przed botami -->
             <input type="hidden" name="bot-field" />
 
-            <!-- Netlify bot protection -->
-            <div netlify-recaptcha></div>
-
+            <!-- reCAPTCHA -->
+            <div
+              class="g-recaptcha"
+              data-sitekey="TWOJ_SITE_KEY_TUTAJ"
+              style="
+                margin: 20px 0;
+                transform: scale(0.85);
+                transform-origin: 0 0;
+              "
+            ></div>
             <button
               type="submit"
               style="
@@ -2624,6 +2634,53 @@
       }
     </style>
     <script>
+      // Walidacja formularza z reCAPTCHA
+      document
+        .getElementById("contact-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault(); // Zatrzymaj standardowe wysyłanie
+
+          // Sprawdź czy reCAPTCHA została wypełniona
+          var recaptchaResponse = grecaptcha.getResponse();
+
+          if (recaptchaResponse.length === 0) {
+            // reCAPTCHA nie została zaznaczona
+            alert(
+              "⚠️ Proszę potwierdzić, że nie jesteś robotem, zaznaczając reCAPTCHA."
+            );
+            return false;
+          }
+
+          // Sprawdź czy wymagane pola są wypełnione
+          var rodzic = document
+            .querySelector('input[name="rodzic"]')
+            .value.trim();
+          var telefon = document
+            .querySelector('input[name="telefon"]')
+            .value.trim();
+          var email = document
+            .querySelector('input[name="email"]')
+            .value.trim();
+
+          if (!rodzic || !telefon || !email) {
+            alert(
+              "⚠️ Proszę wypełnić wszystkie wymagane pola (imię rodzica, telefon, email)."
+            );
+            return false;
+          }
+
+          // Wszystko OK - wyślij formularz
+          showSuccessMessage();
+          this.submit(); // Wyślij formularz normalnie
+        });
+
+      // Pokaż komunikat o sukcesie
+      function showSuccessMessage() {
+        alert(
+          "✅ Dziękujemy! Formularz został wysłany pomyślnie. Odezwiemy się wkrótce!"
+        );
+      }
+
       // Płynne przewijanie do góry
       document
         .getElementById("backToTop")
