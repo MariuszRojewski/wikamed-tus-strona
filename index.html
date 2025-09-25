@@ -2624,12 +2624,21 @@
       }
     </style>
     <script>
+      // Zmienna blokująca wielokrotne wysyłanie
+      let isSubmitting = false;
+      
       // Walidacja formularza z Netlify reCAPTCHA
       document
         .getElementById("contact-form")
         .addEventListener("submit", function (e) {
-          // Sprawdź tylko czy wymagane pola są wypełnione
-          // Netlify automatycznie obsługuje reCAPTCHA walidację
+          // Sprawdź czy formularz nie jest już w trakcie wysyłania
+          if (isSubmitting) {
+            e.preventDefault();
+            alert("⏳ Formularz jest już w trakcie wysyłania. Proszę czekać...");
+            return false;
+          }
+          
+          // Sprawdź czy wymagane pola są wypełnione
           var rodzic = document
             .querySelector('input[name="rodzic"]')
             .value.trim();
@@ -2648,7 +2657,53 @@
             return false;
           }
 
-          // Formularz zostanie wysłany, Netlify sprawdzi reCAPTCHA automatycznie
+          // Sprawdź czy reCAPTCHA została uzupełniona
+          var recaptchaResponse = document.querySelector('[name="g-recaptcha-response"]');
+          var recaptchaDiv = document.querySelector('[data-netlify-recaptcha="true"]');
+          
+          // Sprawdź czy reCAPTCHA została załadowana
+          if (!recaptchaResponse && recaptchaDiv) {
+            // Jeśli reCAPTCHA nie została jeszcze załadowana, poszukaj po iframe
+            var recaptchaIframe = document.querySelector('iframe[src*="recaptcha"]');
+            if (!recaptchaIframe) {
+              e.preventDefault();
+              alert("⏳ reCAPTCHA jest jeszcze ładowana. Proszę spróbować za chwilę.");
+              return false;
+            }
+          }
+          
+          // Sprawdź czy reCAPTCHA została wypełniona
+          if (!recaptchaResponse || !recaptchaResponse.value || recaptchaResponse.value.trim() === '') {
+            e.preventDefault();
+            alert("🤖 Proszę potwierdzić, że nie jesteś robotem (uzupełnij reCAPTCHA).");
+            // Przewiń do reCAPTCHA jeśli jest daleko
+            if (recaptchaDiv) {
+              recaptchaDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            return false;
+          }
+
+          // Zablokuj wielokrotne wysyłanie
+          isSubmitting = true;
+          
+          // Znajdź przycisk i zmień jego stan
+          var submitButton = this.querySelector('button[type="submit"]');
+          var originalText = submitButton.innerHTML;
+          submitButton.innerHTML = "⏳ Wysyłanie...";
+          submitButton.disabled = true;
+          submitButton.style.opacity = "0.6";
+          submitButton.style.cursor = "not-allowed";
+          
+          // Po 3 sekundach przywróć przycisk (zabezpieczenie)
+          setTimeout(function() {
+            submitButton.innerHTML = originalText;
+            submitButton.disabled = false;
+            submitButton.style.opacity = "1";
+            submitButton.style.cursor = "pointer";
+            isSubmitting = false;
+          }, 3000);
+
+          // Pokaż komunikat o wysłaniu
           alert(
             "✅ Dziękujemy! Formularz został wysłany pomyślnie. Odezwiemy się wkrótce!"
           );
