@@ -550,6 +550,7 @@
         font-family: "Playfair Display", serif;
         font-weight: 500;
         font-size: clamp(32px, 5vw, 56px);
+        line-height: 1.25em;
       }
       .highlight em {
         font-style: italic;
@@ -1759,7 +1760,7 @@
           <div>
             <h1>Zadbaj o emocje DZIECKA</h1>
             <p class="highlight">
-              <em>TUS w KONINIE i KOLE</em>
+              <em>Trening Umiejętności Społecznych <br />w KONINIE i KOLE</em>
             </p>
             <a
               class="btn btn-primary cta-lg"
@@ -1769,7 +1770,7 @@
               >Zapisz dziecko</a
             >
             <p class="meta">
-              Dla dzieci 6–14 lat<br />
+              Dla dzieci 6–18 lat<br />
               <strong
                 >Budujemy relacje, pewność siebie i rozumienie emocji</strong
               >
@@ -2386,6 +2387,9 @@
           </div>
           <!-- PRAWA KOLUMNA – FORMULARZ -->
           <form
+            name="wikamed-contact"
+            method="POST"
+            netlify
             class="cta-right"
             style="
               border-radius: 24px;
@@ -2476,6 +2480,34 @@
                 resize: vertical;
               "
             ></textarea>
+
+            <!-- Ukryte pole honeypot dla ochrony przed botami -->
+            <input type="hidden" name="bot-field" />
+
+            <!-- Netlify bot protection -->
+            <div netlify-recaptcha></div>
+
+            <button
+              type="submit"
+              style="
+                background: #fff;
+                color: #d5754b;
+                border: none;
+                border-radius: 16px;
+                padding: 18px 20px;
+                font-size: 1.15em;
+                font-weight: 700;
+                margin-top: 10px;
+                cursor: pointer;
+                font-family: 'Inter', sans-serif;
+                transition: transform 0.2s ease;
+              "
+              onmouseover="this.style.transform='scale(1.02)'"
+              onmouseout="this.style.transform='scale(1)'"
+            >
+              Wyślij formularz
+            </button>
+
             <div
               style="
                 text-align: left;
